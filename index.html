@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cash X</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.adsgram.ai/sdk.js"></script>
+
+<style>
+body{margin:0;font-family:Arial;background:#f5f7fb}
+.wrap{max-width:420px;margin:auto;padding:20px}
+.card{background:#fff;padding:20px;border-radius:16px;margin-top:15px}
+button{width:100%;padding:15px;border:none;border-radius:12px;background:#0ea5e9;color:#fff;font-size:16px;font-weight:bold}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+<h2>Cash X</h2>
+
+<div class="card">
+<h3>Watch Ads</h3>
+<p>Earn +50 LKR</p>
+<button onclick="earn()">Watch Video</button>
+</div>
+
+<div class="card">
+Balance: <b id="bal">0</b> LKR
+</div>
+</div>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+const API = "https://cashx-server.onrender.com";
+const BLOCK = 23172;
+const user = tg.initDataUnsafe.user;
+
+async function load(){
+const r = await fetch(API+"/me/"+user.id);
+const d = await r.json();
+document.getElementById("bal").innerText=d.balance;
+}
+load();
+
+function waitAds(){
+return new Promise((res,rej)=>{
+let t=setInterval(()=>{
+if(window.Adsgram){
+clearInterval(t);
+res(window.Adsgram);
+}
+},300);
+});
+}
+
+async function earn(){
+const Ads=await waitAds();
+await Ads.showRewarded({
+blockId:BLOCK,
+userId:String(user.id)
+});
+setTimeout(load,1500);
+}
+</script>
+
+</body>
+</html>
