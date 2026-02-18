@@ -134,7 +134,7 @@ const userId = tg.initDataUnsafe?.user?.id;
 let balance = 0;
 
 async function watchAd(){
-  const res = await fetch("https://https://ezcash.onrender.com/watch-ad",{
+  const res = await fetch("https://YOUR_BACKEND_URL/watch-ad",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({userId})
@@ -150,8 +150,7 @@ async function watchAd(){
 }
 
 function copyReferral(){
- const link = "https://t.me/ezcash_lk_bot?start=" + userId;
-
+  const link="https://t.me/YOUR_BOT_USERNAME?start="+userId;
   navigator.clipboard.writeText(link);
   alert("Referral link copy වුණා!");
 }
