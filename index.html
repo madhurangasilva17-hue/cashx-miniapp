@@ -21,8 +21,9 @@ body{
   border-bottom-right-radius:25px;
 }
 
-.header h2{
-  margin:0;
+.username{
+  font-size:14px;
+  opacity:0.9;
 }
 
 .balance-box{
@@ -46,6 +47,20 @@ body{
   padding:15px;
   border-radius:15px;
   box-shadow:0 3px 8px rgba(0,0,0,0.08);
+}
+
+.progress-bar{
+  height:8px;
+  background:#ddd;
+  border-radius:10px;
+  margin-top:10px;
+}
+
+.progress-fill{
+  height:8px;
+  background:#2196f3;
+  border-radius:10px;
+  width:0%;
 }
 
 .btn{
@@ -90,18 +105,27 @@ body{
 <body>
 
 <div class="header">
-  <h2>EzCash වෙත සාදරයෙන් පිළිගනිමු 👋</h2>
+  <div class="username" id="username">සාදරයෙන් පිළිගනිමු 👋</div>
+  <h2>EzCash</h2>
   <p>කාර්යයන් කර මුදල් උපයන්න</p>
 </div>
 
 <div class="balance-box">
-  <div>ඔබගේ මුළු ශේෂය</div>
+  <div>ඔබගේ මුළු උපයාගත් මුදල</div>
   <div class="balance-amount" id="balance">0.00 LKR</div>
 </div>
 
 <div class="card">
+  <h3>📊 දිනපතා ප්‍රගතිය</h3>
+  <p>අද දැන්වීම් 30ක් බලන්න පුළුවන්</p>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress"></div>
+  </div>
+  <p id="progressText">0 / 30 සම්පූර්ණයි</p>
+</div>
+
+<div class="card">
   <h3>📺 දැන්වීම් බලන්න</h3>
-  <p>දිනකට දැන්වීම් 30ක් බලන්න පුළුවන්</p>
   <button class="btn green" onclick="watchAd()">දැන්වීම බලන්න (+100 LKR)</button>
 </div>
 
@@ -130,27 +154,39 @@ body{
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-const userId = tg.initDataUnsafe?.user?.id;
+const user = tg.initDataUnsafe?.user;
+const userId = user?.id;
+
+if(user){
+  document.getElementById("username").innerText =
+    user.first_name + " වෙත සාදරයෙන් පිළිගනිමු 👋";
+}
+
 let balance = 0;
+let adsToday = 0;
 
 async function watchAd(){
-  const res = await fetch("https://YOUR_BACKEND_URL/watch-ad",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({userId})
-  });
-  const data = await res.json();
-  if(data.error){
-    alert(data.error);
-  }else{
-    balance=data.balance;
-    document.getElementById("balance").innerText=balance+" LKR";
-    alert("🎉 ඔබට 100 LKR එකතු වුණා!");
+  if(adsToday >= 30){
+    alert("අද සඳහා දැන්වීම් සීමාව සම්පූර්ණයි");
+    return;
   }
+
+  adsToday++;
+  balance += 100;
+
+  document.getElementById("balance").innerText = balance + " LKR";
+
+  let percent = (adsToday/30)*100;
+  document.getElementById("progress").style.width = percent + "%";
+  document.getElementById("progressText").innerText =
+    adsToday + " / 30 සම්පූර්ණයි";
+
+  alert("🎉 ඔබට 100 LKR එකතු වුණා!");
 }
 
 function copyReferral(){
-  const link="https://t.me/YOUR_BOT_USERNAME?start="+userId;
+const link="https://t.me/ezcash_lk_bot?start="+userId;
+
   navigator.clipboard.writeText(link);
   alert("Referral link copy වුණා!");
 }
